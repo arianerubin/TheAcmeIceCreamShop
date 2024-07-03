@@ -8,12 +8,12 @@ const client = new pg.Client(
   process.env.DATABASE_URL || "postgres://localhost/acme_icecreamshop_db"
 );
 
-const port = process.env.PORT || 3002;
+const port = process.env.PORT || 4000;
 
 app.get("/api/flavors", async (req, res, next) => {
   try {
     const SQL = `
-    SELECT * from flavors ORDER BY id;
+    SELECT * FROM flavors ORDER BY id;
     `;
     const response = await client.query(SQL);
     res.send(response.rows);
@@ -25,7 +25,7 @@ app.get("/api/flavors", async (req, res, next) => {
 app.get("/api/flavors/:id", async (req, res, next) => {
   try {
     const SQL = `
-    SELECT * from flavors WHERE id = $1
+    SELECT * FROM flavors WHERE id = $1
     `;
     const response = await client.query(SQL, [req.params.id]);
     res.send(response.rows);
@@ -88,12 +88,13 @@ const init = async () => {
     await client.connect();
     console.log("connected to database");
     let SQL = `
-        CREATE TABLE flavors
+        DROP TABLE IF EXISTS flavors;
+        CREATE TABLE flavors (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         is_favorite BOOLEAN DEFAULT false,
         created_at TIMESTAMP DEFAULT now(),
-        updated_at TIMESTAMP DEFAULT now(),
+        updated_at TIMESTAMP DEFAULT now()
         );   
          `;
     await client.query(SQL);
